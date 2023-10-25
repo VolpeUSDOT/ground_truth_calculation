@@ -32,6 +32,59 @@ def load_data(filepath):
 
     return eye_loc, car_points, nvp_points
 
+def fix_car_bounds(car_points, nvp_points):
+    """
+    
+    """
+    car_points_trimmed = trim_car_data(car_points, nvp_points)
+
+    left_bound = get_intersection(car_points_trimmed[0:2, :], nvp_points[0, :])
+    right_bound = get_intersection(car_points_trimmed[-2:, :], nvp_points[-1, :])
+    
+    car_points_trimmed[0, :] = left_bound
+    car_points_trimmed[-1, :] = right_bound
+
+    return car_points_trimmed
+
+def trim_car_data(car_points, nvp_points):
+    """
+    
+    """
+    num_car_points = np.shape(car_points)[0]
+
+    leftmost_ang = nvp_points[0, 3]
+    rightmost_ang = nvp_points[-1, 3]
+    print(leftmost_ang, rightmost_ang)
+
+    left_bound_index = None
+    right_bound_index = None
+    for i in range(num_car_points):
+        if car_points[i, 3] < leftmost_ang and left_bound_index is None:
+            left_bound_index = i
+        if car_points[i, 3] < rightmost_ang and right_bound_index is None:
+            right_bound_index = i
+    
+    car_points_trimmed = car_points[left_bound_index - 1 : right_bound_index + 1, :]
+
+    return car_points_trimmed
+
+def get_intersection(car_pair, nvp_point):
+    """
+    
+    """
+    car_point1 = car_pair[0]
+    car_point2 = car_pair[1]
+
+    car_slope = (car_point2[1] - car_point1[1]) / (car_point2[0] - car_point1[0])
+    nvp_slope = nvp_point[1] / nvp_point[0]
+
+    x_int = ((car_slope * car_point1[0]) - car_point1[1]) / (car_slope - nvp_slope)
+    y_int = nvp_slope * x_int
+
+    ordered_pair = np.array([[x_int, y_int]])
+
+    return np.concatenate((ordered_pair, cart_to_polar(ordered_pair)), axis=1)
+
 def cart_to_polar(pts):
     """
     
