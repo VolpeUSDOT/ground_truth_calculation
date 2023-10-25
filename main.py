@@ -1,16 +1,15 @@
 import numpy as np
 import math
 
-from data_processing import load_data, plot_data
+from data_processing import load_data, fix_car_bounds, plot_data
 
 def main():
     
     eye_point, car_points, nvp_points = load_data("./Data/HondaOdysseyGroundTruth.csv")
+    car_points = fix_car_bounds(car_points, nvp_points)
     plot_data(eye_point, car_points, nvp_points)
 
     num_nvp_points = np.shape(nvp_points)[0]
-    num_car_points = np.shape(car_points)[0]
-
     nvp_area = 0
     for i in range(num_nvp_points - 1):
         left_dist = get_distance(eye_point[0], nvp_points[i])
@@ -20,9 +19,8 @@ def main():
         triangle_area = get_area(left_dist, right_dist, between_dist)
 
         nvp_area += triangle_area
-
     
-
+    print(nvp_area) # square inches
     
 def get_distance(point1, point2):
     """
