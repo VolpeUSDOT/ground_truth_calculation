@@ -7,7 +7,6 @@ def main():
     
     eye_point, car_points, nvp_points = load_data("./Data/HondaOdysseyGroundTruth.csv")
     car_points = fix_car_bounds(car_points, nvp_points)
-    plot_data(eye_point, car_points, nvp_points)
 
     num_nvp_points = np.shape(nvp_points)[0]
     nvp_area = 0
@@ -19,8 +18,26 @@ def main():
         triangle_area = get_area(left_dist, right_dist, between_dist)
 
         nvp_area += triangle_area
-    
     print(nvp_area) # square inches
+
+    num_car_points = np.shape(car_points)[0]
+    car_area = 0
+    for i in range(num_car_points - 1):
+        left_dist = get_distance(eye_point[0], car_points[i])
+        right_dist = get_distance(eye_point[0], car_points[i+1])
+        between_dist = get_distance(car_points[i], car_points[i+1])
+
+        triangle_area = get_area(left_dist, right_dist, between_dist)
+
+        car_area += triangle_area
+    print(car_area) # square inches
+
+    shadow_area = nvp_area - car_area
+
+    print(f"Shadow Area: {shadow_area} sq. in.")
+
+    plot_data(eye_point, car_points, nvp_points)
+
     
 def get_distance(point1, point2):
     """
@@ -42,7 +59,7 @@ def get_area(side1, side2, side3):
     Returns:
         A float representing the area of the triangle (in square inches)
     """
-    semiperimeter = side1 + side2 + side3
+    semiperimeter = (side1 + side2 + side3) / 2
     return math.sqrt((semiperimeter) * (semiperimeter - side1) * (semiperimeter - side2) * (semiperimeter - side3))
 
 if __name__=="__main__":
