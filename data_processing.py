@@ -122,17 +122,17 @@ def plot_data(eye_pt, car_pts, nvp_pts):
     eye_r = eye_pt[:, 2]
     eye_theta = eye_pt[:, 3]
 
-    fig1 = plt.figure()
-    ax_pol = fig1.add_subplot(projection="polar")
+    fig1 = plt.figure(figsize=(10, 5))
+    ax_pol = fig1.add_subplot(121, projection="polar")
     ax_pol.scatter(nvp_theta, nvp_r, c="#00ff00")
     ax_pol.scatter(car_theta, car_r, c="#ff0000")
     ax_pol.scatter(eye_theta, eye_r, c="#0000ff")
 
-    fig2 = plt.figure()
-    ax_cart = fig2.add_subplot()
+    ax_cart = fig1.add_subplot(122)
     ax_cart.scatter(nvp_x, nvp_y, c="#00ff00")
     ax_cart.scatter(car_x, car_y, c="#ff0000")
     ax_cart.scatter(eye_x, eye_y, c="#0000ff")
+    ax_cart.set_aspect("equal", "box")
     
     plt.show()
     
