@@ -93,7 +93,13 @@ def cart_to_polar(pts):
     y = pts[:, 1]
 
     r = np.sqrt(np.square(x) + np.square(y)).reshape((np.shape(pts)[0], -1))
+    
+    # angles in quad 1 and 2 are pos, angles in quad 3 and 4 are neg
     theta = np.arctan2(y, x).reshape((np.shape(pts)[0], -1)) # radians
+
+    # make values in the third quadrant positive so that sorting points wraps
+    # from back of car clockwise after sorting points by angle 
+    theta += np.ones((np.shape(theta)[0], 1)) * 2 * np.pi * (theta < -np.pi / 2)
 
     return np.concatenate((r, theta), axis=1)
 
