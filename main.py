@@ -4,9 +4,11 @@ import math
 from data_processing import load_data, fix_car_bounds, plot_data
 
 def main():
-    
-    eye_point, car_points, nvp_points = load_data("./Data/HondaOdysseyGroundTruth.csv")
-    car_points = fix_car_bounds(car_points, nvp_points)
+    testfile = "./Data/TestData.csv"
+    hondafile = "./Data/HondaOdysseyGroundTruth.csv"
+
+    eye_point, car_points, nvp_points = load_data(hondafile)
+    processed_car_points = fix_car_bounds(car_points, nvp_points)
 
     num_nvp_points = np.shape(nvp_points)[0]
     nvp_area = 0
@@ -20,12 +22,12 @@ def main():
         nvp_area += triangle_area
     print(nvp_area) # square inches
 
-    num_car_points = np.shape(car_points)[0]
+    num_processed_car_points = np.shape(processed_car_points)[0]
     car_area = 0
-    for i in range(num_car_points - 1):
-        left_dist = get_distance(eye_point[0], car_points[i])
-        right_dist = get_distance(eye_point[0], car_points[i+1])
-        between_dist = get_distance(car_points[i], car_points[i+1])
+    for i in range(num_processed_car_points - 1):
+        left_dist = get_distance(eye_point[0], processed_car_points[i])
+        right_dist = get_distance(eye_point[0], processed_car_points[i+1])
+        between_dist = get_distance(processed_car_points[i], processed_car_points[i+1])
 
         triangle_area = get_area(left_dist, right_dist, between_dist)
 
@@ -36,7 +38,7 @@ def main():
 
     print(f"Shadow Area: {shadow_area} sq. in.")
 
-    plot_data(eye_point, car_points, nvp_points)
+    plot_data(eye_point, processed_car_points, nvp_points)
 
     
 def get_distance(point1, point2):
