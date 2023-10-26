@@ -4,8 +4,8 @@ import math
 from data_processing import load_data, fix_car_bounds, plot_data
 
 def main():
-    testfile = "./data/TestData.csv"
-    hondafile = "./data/HondaOdysseyGroundTruth.csv"
+    testfile = "./Data/TestData.csv"
+    hondafile = "./Data/HondaOdysseyGroundTruth.csv"
 
     eye_point, car_points, nvp_points = load_data(hondafile)
     processed_car_points = fix_car_bounds(car_points, nvp_points)
