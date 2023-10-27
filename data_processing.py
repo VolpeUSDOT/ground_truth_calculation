@@ -8,11 +8,11 @@ def load_data(filepath):
     """
     df = pd.read_csv(filepath)
 
-    eye_loc = df[df["Point"] == "Eye"][["X (in)", "Y (in)"]].to_numpy()
+    eye_loc = df[df["Point"] == "Eye"][["x (in)", "y (in)"]].to_numpy()
 
     # extract points and make eye as origin
-    car_points = df[df["Point"].str.contains("Car")][["X (in)", "Y (in)"]].to_numpy() - eye_loc
-    nvp_points = df[df["Point"].str.contains("Car|Eye") == False][["X (in)", "Y (in)"]].to_numpy() - eye_loc
+    car_points = df[df["Point"].str.contains("Car")][["x (in)", "y (in)"]].to_numpy() - eye_loc
+    nvp_points = df[df["Point"].str.contains("Car|Eye") == False][["x (in)", "y (in)"]].to_numpy() - eye_loc
     eye_loc -= eye_loc
 
     # flip y-coordinate to reflect across x-axis
