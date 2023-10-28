@@ -54,7 +54,6 @@ def trim_car_data(car_points, nvp_points):
 
     leftmost_ang = nvp_points[0, 3]
     rightmost_ang = nvp_points[-1, 3]
-    print(leftmost_ang, rightmost_ang)
 
     left_bound_index = None
     right_bound_index = None
