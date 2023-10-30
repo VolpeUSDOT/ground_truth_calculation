@@ -10,13 +10,13 @@ def load_data():
     """
     # load and process markerless
     markerless_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerless.csv")
-    markerless_nvp = markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy() + np.array([[.1115, .725]])
+    markerless_nvp = markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.1155, -7.2507]])
     markerless_nvp = np.concatenate((markerless_nvp, cart_to_polar(markerless_nvp)), axis=1)
     markerless_nvp = markerless_nvp[markerless_nvp[:, 3].argsort()[::-1]]
 
     # load and process markeless flipped
     markerless_flipped_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessXYFlip.csv")
-    markerless_flipped_nvp = markerless_flipped_data_raw[["x (ft)", "y (ft)"]].to_numpy() + np.array([[.725, .1115]])
+    markerless_flipped_nvp = markerless_flipped_data_raw[["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.1155, -7.2507]])
     markerless_flipped_nvp = np.concatenate((markerless_flipped_nvp, cart_to_polar(markerless_flipped_nvp)), axis=1)
     markerless_flipped_nvp = markerless_flipped_nvp[markerless_flipped_nvp[:, 3].argsort()[::-1]]
     
