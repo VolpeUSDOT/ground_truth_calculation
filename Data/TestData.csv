@@ -1,4 +1,4 @@
-Point,X (in),Y (in)
+Point,x (ft),y (ft)
 Eye,6,7
 Front,3,1.803847577
 Front,3.5,1.545643943
