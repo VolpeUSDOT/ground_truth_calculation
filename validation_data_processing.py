@@ -9,16 +9,10 @@ def load_data():
     
     """
     # load and process markerless
-    markerless_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerless.csv")
-    markerless_nvp = markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.1155, -7.2507]])
+    markerless_data_raw = pd.read_csv("./Data/HondaOdysseyFixedInputs.csv")
+    markerless_nvp = markerless_data_raw[(abs(markerless_data_raw["x (ft)"]) <= 40) & (abs(markerless_data_raw["y (ft)"]) <= 20)][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.1155, -7.2507]])
     markerless_nvp = np.concatenate((markerless_nvp, cart_to_polar(markerless_nvp)), axis=1)
     markerless_nvp = markerless_nvp[markerless_nvp[:, 3].argsort()[::-1]]
-
-    # load and process markeless flipped
-    markerless_flipped_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessXYFlip.csv")
-    markerless_flipped_nvp = markerless_flipped_data_raw[["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.1155, -7.2507]])
-    markerless_flipped_nvp = np.concatenate((markerless_flipped_nvp, cart_to_polar(markerless_flipped_nvp)), axis=1)
-    markerless_flipped_nvp = markerless_flipped_nvp[markerless_flipped_nvp[:, 3].argsort()[::-1]]
     
     # load and process view1.0 nvps
     view1_data_raw = pd.read_csv("./Data/HondaOdysseyVIEW1.0.csv")
@@ -34,7 +28,7 @@ def load_data():
     ground_nvp = np.concatenate((ground_nvp, cart_to_polar(ground_nvp)), axis=1)
     ground_nvp = ground_nvp[ground_nvp[:, 3].argsort()[::-1]]
 
-    return [markerless_nvp, markerless_flipped_nvp, view1_nvp, ground_nvp]
+    return [markerless_nvp, view1_nvp, ground_nvp]
 
 def plot_data(datasets, names):
     """
@@ -48,5 +42,11 @@ def plot_data(datasets, names):
     for i in range(num_sets):
         ax.scatter(datasets[i][:, 0], datasets[i][:, 1], c=colors[i % len(colors)])
     
+    ax.axvline(x=0, ymin=0, ymax=1, c="k")
+    ax.axhline(y=0, xmin=0, xmax=1, c="k")
+    ax.set_title("NVPs with Eye Point as Origin")
+    ax.set_xlabel("x-Direction (ft)")
+    ax.set_ylabel("y-Direction (ft)")
     ax.legend(names)
+    fig.tight_layout()
     plt.show()
