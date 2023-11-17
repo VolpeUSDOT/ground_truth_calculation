@@ -4,7 +4,7 @@ import numpy as np
 
 def main():
     datasets = load_data()
-    labels = ["Markerless", "Markerless Flipped", "VIEW 1.0", "Ground Truth"]
+    labels = ["Markerless", "VIEW 1.0", "Ground Truth"]
 
     eye_point = np.array([[0, 0]])
     nvp_areas = []
