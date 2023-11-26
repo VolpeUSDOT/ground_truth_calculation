@@ -20,7 +20,7 @@ def load_data():
     view1_nvp = np.concatenate((view1_nvp, cart_to_polar(view1_nvp)), axis=1)
     view1_nvp = view1_nvp[view1_nvp[:, 3].argsort()[::-1]]
 
-     # load and process view1.0 nvps
+     # load and process view1.0 rig nvps
     view1rig_data_raw = pd.read_csv("./Data/HondaOdysseyVIEW1.0Rig.csv")
     view1rig_nvp = view1rig_data_raw[view1rig_data_raw["NVP (in)"] != 438][["x (ft)", "y (ft)"]].to_numpy()
     view1rig_nvp = np.concatenate((view1rig_nvp, cart_to_polar(view1rig_nvp)), axis=1)
@@ -34,7 +34,15 @@ def load_data():
     ground_nvp = np.concatenate((ground_nvp, cart_to_polar(ground_nvp)), axis=1)
     ground_nvp = ground_nvp[ground_nvp[:, 3].argsort()[::-1]]
 
-    return [markerless_nvp, view1_nvp, ground_nvp, view1rig_nvp]
+    # load and process ground truth rig nvps
+    groundrig_data_raw = pd.read_csv("./Data/HondaOdysseyGroundTruthRig.csv")
+    groundrig_eye_loc = groundrig_data_raw[groundrig_data_raw["Point"] == "Eye"][["x (ft)", "y (ft)"]].to_numpy()
+    groundrig_nvp = groundrig_data_raw[groundrig_data_raw["Point"] == "Car"][["x (ft)", "y (ft)"]].to_numpy() - groundrig_eye_loc
+    groundrig_nvp[:, 1] = groundrig_nvp[:, 1] * -1
+    groundrig_nvp = np.concatenate((groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1)
+    groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
+
+    return [markerless_nvp, view1_nvp, ground_nvp, view1rig_nvp, groundrig_nvp]
 
 def plot_data(datasets, names):
     """

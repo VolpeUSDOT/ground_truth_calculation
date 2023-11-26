@@ -4,7 +4,7 @@ import numpy as np
 
 def main():
     datasets = load_data()
-    labels = ["Markerless", "VIEW 1.0", "Ground Truth", "VIEW 1.0 Rig"]
+    labels = ["Markerless", "VIEW 1.0", "Ground Truth", "VIEW 1.0 Rig", "Ground Truth Rig"]
 
     eye_point = np.array([[0, 0]])
     nvp_areas = []
@@ -26,8 +26,10 @@ def main():
     for i, label in enumerate(labels):
         print(f"NVP Area for {label}: {nvp_areas[i]} sq. ft. Percent Error: {((nvp_areas[i] - nvp_areas[-1]) / nvp_areas[-1]) * 100: .2f}%")
 
-    plot_data(datasets[:-1], labels[:-1])
-    # plot_data(datasets, labels)
+    # w/o rig
+    plot_data(datasets[:-2], labels[:-2])
+    # plot just rig
+    plot_data(datasets[-2:], labels[-2:])
 
 if __name__=="__main__":
     main()
