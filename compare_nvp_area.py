@@ -4,7 +4,7 @@ import numpy as np
 
 def main():
     datasets = load_data()
-    labels = ["Markerless", "VIEW 1.0", "Ground Truth"]
+    labels = ["Markerless", "VIEW 1.0", "Ground Truth", "VIEW 1.0 Rig"]
 
     eye_point = np.array([[0, 0]])
     nvp_areas = []
@@ -13,6 +13,7 @@ def main():
         num_nvp_points = np.shape(dataset)[0]
         nvp_area = 0
         for i in range(num_nvp_points - 1):
+            # print(dataset[i])
             left_dist = get_distance(eye_point[0], dataset[i])
             right_dist = get_distance(eye_point[0], dataset[i+1])
             between_dist = get_distance(dataset[i], dataset[i+1])
@@ -25,7 +26,8 @@ def main():
     for i, label in enumerate(labels):
         print(f"NVP Area for {label}: {nvp_areas[i]} sq. ft. Percent Error: {((nvp_areas[i] - nvp_areas[-1]) / nvp_areas[-1]) * 100: .2f}%")
 
-    plot_data(datasets, labels)
+    plot_data(datasets[:-1], labels[:-1])
+    # plot_data(datasets, labels)
 
 if __name__=="__main__":
     main()
