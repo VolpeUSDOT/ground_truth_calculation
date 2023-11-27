@@ -48,7 +48,13 @@ def load_data():
     groundrig_nvp = np.concatenate((groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1)
     groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
 
-    return [markerless_nvp, view1_nvp, ground_nvp, markerlessrig_nvp, view1rig_nvp, groundrig_nvp]
+    # load and process lidar rig nvps
+    lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
+    lidarrig_nvp = lidarrig_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
+    lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
+
+    return [markerless_nvp, view1_nvp, ground_nvp, markerlessrig_nvp, view1rig_nvp, lidarrig_nvp, groundrig_nvp]
 
 def plot_data(datasets, names):
     """
