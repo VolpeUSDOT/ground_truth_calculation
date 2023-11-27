@@ -27,9 +27,9 @@ def main():
         print(f"NVP Area for {label}: {nvp_areas[i]} sq. ft. Percent Error: {((nvp_areas[i] - nvp_areas[-1]) / nvp_areas[-1]) * 100: .2f}%")
 
     # w/o rig
-    plot_data(datasets[:-3], labels[:-3])
+    plot_data(datasets[:-4], labels[:-4])
     # plot just rig
-    plot_data(datasets[-3:], labels[-3:])
+    plot_data(datasets[-4:], labels[-4:])
 
 if __name__=="__main__":
     main()
