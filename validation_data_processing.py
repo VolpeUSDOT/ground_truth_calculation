@@ -9,10 +9,16 @@ def load_data():
     
     """
     # load and process markerless
-    markerless_data_raw = pd.read_csv("./Data/HondaOdysseyFixedInputs.csv")
+    markerless_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerless.csv")
     markerless_nvp = markerless_data_raw[(abs(markerless_data_raw["x (ft)"]) <= 40) & (abs(markerless_data_raw["y (ft)"]) <= 20)][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.1155, -7.2507]])
     markerless_nvp = np.concatenate((markerless_nvp, cart_to_polar(markerless_nvp)), axis=1)
     markerless_nvp = markerless_nvp[markerless_nvp[:, 3].argsort()[::-1]]
+
+    # load and process markerless with rig
+    markerlessrig_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessRig.csv")
+    markerlessrig_nvp = markerlessrig_data_raw[(abs(markerlessrig_data_raw["x (ft)"]) <= 40) & (abs(markerlessrig_data_raw["y (ft)"]) <= 20)][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.8542, -7.5208]])
+    markerlessrig_nvp = np.concatenate((markerlessrig_nvp, cart_to_polar(markerlessrig_nvp)), axis=1)
+    markerlessrig_nvp = markerlessrig_nvp[markerlessrig_nvp[:, 3].argsort()[::-1]]
     
     # load and process view1.0 nvps
     view1_data_raw = pd.read_csv("./Data/HondaOdysseyVIEW1.0.csv")
@@ -42,7 +48,7 @@ def load_data():
     groundrig_nvp = np.concatenate((groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1)
     groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
 
-    return [markerless_nvp, view1_nvp, ground_nvp, view1rig_nvp, groundrig_nvp]
+    return [markerless_nvp, view1_nvp, ground_nvp, markerlessrig_nvp, view1rig_nvp, groundrig_nvp]
 
 def plot_data(datasets, names):
     """
