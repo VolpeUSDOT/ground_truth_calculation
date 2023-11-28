@@ -4,7 +4,8 @@ import numpy as np
 
 def main():
     datasets = load_data()
-    labels = ["Markerless", "VIEW 1.0", "Ground Truth", "Markerless Rig", "VIEW 1.0 Rig", "Lidar Rig", "Ground Truth Rig"]
+    # labels = ["Markerless", "VIEW 1.0", "Ground Truth", "Markerless Rig", "VIEW 1.0 Rig", "Lidar Rig", "Ground Truth Rig"]
+    labels = ["Markerless Rig", "VIEW 1.0 Rig", "Lidar Rig", "Ground Truth Rig"]
 
     eye_point = np.array([[0, 0]])
     nvp_areas = []
@@ -24,12 +25,15 @@ def main():
         nvp_areas.append(nvp_area)
     
     for i, label in enumerate(labels):
-        print(f"NVP Area for {label}: {nvp_areas[i]} sq. ft. Percent Error: {((nvp_areas[i] - nvp_areas[-1]) / nvp_areas[-1]) * 100: .2f}%")
+        if "Ground Truth" not in label:
+            print(f"NVP Area for {label}: {nvp_areas[i]} sq. ft. Percent Error: {((nvp_areas[i] - nvp_areas[-1]) / nvp_areas[-1]) * 100: .2f}%")
+        else:
+            print(f"NVP Area for {label}: {nvp_areas[i]} sq. ft.")
 
     # w/o rig
-    plot_data(datasets[:-4], labels[:-4])
+    # plot_data(datasets[:-4], labels[:-4])
     # plot just rig
-    plot_data(datasets[-4:], labels[-4:])
+    plot_data(datasets, labels)
 
 if __name__=="__main__":
     main()

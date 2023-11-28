@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pylab as plt
 import numpy as np
 
-from data_processing import cart_to_polar
+from data_processing import cart_to_polar, get_intersection
 
 def load_data():
     """
@@ -32,6 +32,12 @@ def load_data():
     view1rig_nvp = np.concatenate((view1rig_nvp, cart_to_polar(view1rig_nvp)), axis=1)
     view1rig_nvp = view1rig_nvp[view1rig_nvp[:, 3].argsort()[::-1]]
 
+    # load and process lidar nvps with rig setup
+    lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
+    lidarrig_nvp = lidarrig_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
+    lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
+
     # load and process ground truth nvps
     ground_data_raw = pd.read_csv("./Data/HondaOdysseyGroundTruth.csv")
     ground_eye_loc = ground_data_raw[ground_data_raw["Point"] == "Eye"][["x (ft)", "y (ft)"]].to_numpy()
@@ -48,13 +54,59 @@ def load_data():
     groundrig_nvp = np.concatenate((groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1)
     groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
 
-    # load and process lidar rig nvps
-    lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
-    lidarrig_nvp = lidarrig_data_raw[["x (ft)", "y (ft)"]].to_numpy()
-    lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
-    lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
+    # datasets = [markerless_nvp, view1_nvp, ground_nvp, markerlessrig_nvp, view1rig_nvp, lidarrig_nvp, groundrig_nvp]
+    datasets = [markerlessrig_nvp, view1rig_nvp, lidarrig_nvp, groundrig_nvp]
+    left_bound, right_bound = get_left_and_right_bound(datasets)
 
-    return [markerless_nvp, view1_nvp, ground_nvp, markerlessrig_nvp, view1rig_nvp, lidarrig_nvp, groundrig_nvp]
+    return trim_datasets(datasets, left_bound, right_bound)
+
+def get_left_and_right_bound(datasets):
+    """
+    
+    """
+    leftmost_points = [dataset[0, :] for dataset in datasets]
+    rightmost_points = [dataset[-1, :] for dataset in datasets]
+
+    left = min(leftmost_points, key=lambda x: x[3])
+    right = max(rightmost_points, key=lambda x: x[3])
+
+    return left, right
+
+def trim_datasets(datasets, left_bound, right_bound):
+    """
+    
+    """
+    res = []
+    for dataset in datasets:
+        if not np.array_equal(dataset[0, :], left_bound):
+            left_ind = None
+            for i, point in enumerate(dataset):
+                if left_ind is None or point[3] > left_bound[3]:
+                    left_ind = i
+                else:
+                    break
+        else:
+            left_ind = 0
+        
+        if not np.array_equal(dataset[-1, :], right_bound):
+            right_ind = None
+            for i, point in enumerate(dataset[::-1]):
+                if right_ind is None or point[3] < right_bound[3]:
+                    right_ind = len(dataset) - i
+                else:
+                    break
+        else:
+            right_ind = -1
+
+        new_dataset = dataset[left_ind:right_ind, :]
+        if not np.array_equal(dataset[0, :], left_bound):
+            new_dataset[0, :] = get_intersection(new_dataset[0:2, :], left_bound)
+        if not np.array_equal(dataset[-1, :], right_bound):
+            new_dataset[-1, :] = get_intersection(new_dataset[-2:, :], right_bound)
+        res.append(new_dataset)
+
+    return res
+            
 
 def plot_data(datasets, names):
     """
