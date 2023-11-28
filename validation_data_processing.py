@@ -34,7 +34,8 @@ def load_data():
 
     # load and process lidar nvps with rig setup
     lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
-    lidarrig_nvp = lidarrig_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # lidarrig_nvp = lidarrig_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    lidarrig_nvp = lidarrig_data_raw[(abs(lidarrig_data_raw["x (ft)"]) <= 40)][["x (ft)", "y (ft)"]].to_numpy()
     lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
     lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
 
