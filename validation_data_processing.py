@@ -17,6 +17,7 @@ def load_data():
     # load and process markerless with rig
     markerlessrig_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessRig.csv")
     markerlessrig_nvp = markerlessrig_data_raw[(abs(markerlessrig_data_raw["x (ft)"]) <= 40) & (abs(markerlessrig_data_raw["y (ft)"]) <= 20)][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.8542, -7.5208]])
+    markerlessrig_nvp = markerlessrig_nvp[~((markerlessrig_nvp[:, 0] > 13.5) & (markerlessrig_nvp[:, 0] < 15.7) & (markerlessrig_nvp[:, 1] > 9.5) & (markerlessrig_nvp[:, 1] < 13.4))]
     markerlessrig_nvp = np.concatenate((markerlessrig_nvp, cart_to_polar(markerlessrig_nvp)), axis=1)
     markerlessrig_nvp = markerlessrig_nvp[markerlessrig_nvp[:, 3].argsort()[::-1]]
     
@@ -113,19 +114,26 @@ def plot_data(datasets, names):
     """
     
     """
-    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
+    colors = ["#ED037C", "#00458C", "#C0D028", 'g', 'c', 'r']
+    shapes = ["o", "v", "s", "D", "P", "X", "d", "p", "x", "h", "8"]
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
     num_sets = len(datasets)
     for i in range(num_sets):
-        ax.scatter(datasets[i][:, 0], datasets[i][:, 1], c=colors[i % len(colors)])
+        if "Ground Truth" in names[i]:
+            color = "#000000"
+        else:
+            color = colors[i % len(colors)]
+        ax.scatter(datasets[i][:, 0], datasets[i][:, 1], s=10, c=color, marker=shapes[i % len(shapes)])
     
+    ax.grid(True)
+    ax.legend(names)
     ax.axvline(x=0, ymin=0, ymax=1, c="k")
     ax.axhline(y=0, xmin=0, xmax=1, c="k")
     ax.set_title("NVPs with Eye Point as Origin")
     ax.set_xlabel("x-Direction (ft)")
     ax.set_ylabel("y-Direction (ft)")
-    ax.legend(names)
+    ax.axis("square")
     fig.tight_layout()
     plt.show()
