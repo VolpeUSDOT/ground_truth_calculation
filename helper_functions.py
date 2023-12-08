@@ -1,5 +1,5 @@
 """
-File containing helper functions for the main program.
+File containing math helper functions.
 """
 import math
 import numpy as np
