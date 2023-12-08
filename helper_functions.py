@@ -57,3 +57,30 @@ def cart_to_polar(pts):
     theta += np.ones((np.shape(theta)[0], 1)) * 2 * np.pi * (theta < -np.pi / 2)
 
     return np.concatenate((r, theta), axis=1)
+
+
+def get_intersection(point_pair, third_point):
+    """
+    Given a pair of points and a third point, calculate the intersection between
+    a line drawn between the pair of points and the line drawn through the third
+    point and the origin.
+
+    Args:
+        point_pair: a numpy array of shape (2, 2) containing the x and y coordinates of two points
+        third_point: a numpy array of shape (1, 2) containing the x and y coordinates of a point
+    Returns:
+        A numpy array of shape (1, 4) containing the x and y coordinates of the intersection
+        point and the r and theta coordinates of the intersection point
+    """
+    point1 = point_pair[0]
+    point2 = point_pair[1]
+
+    point_slope = (point2[1] - point1[1]) / (point2[0] - point1[0])
+    third_point_slope = third_point[1] / third_point[0]
+
+    x_int = ((point_slope * point1[0]) - point1[1]) / (point_slope - third_point_slope)
+    y_int = third_point_slope * x_int
+
+    ordered_pair = np.array([[x_int, y_int]])
+
+    return np.concatenate((ordered_pair, cart_to_polar(ordered_pair)), axis=1)
