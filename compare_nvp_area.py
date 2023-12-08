@@ -1,5 +1,5 @@
 from validation_data_processing import load_data, plot_data
-from ground_truth_shadow import get_area, get_distance
+from helper_functions import get_area, get_distance
 import numpy as np
 
 
