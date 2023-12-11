@@ -30,7 +30,7 @@ Add code to or modify the following files and functions to get a visualization o
      ```python
      # load NVPs
      DATA_raw = pd.read_csv(DATA_FILEPATH)
-     # filter points that are too far
+     # extract data from correct columns
      DATA_nvps = DATA_raw[["x (ft)", "y (ft)"]].to_numpy()
      # append column with polar coordinates
      DATA_nvps = np.concatenate((DATA_nvps, cart_to_polar(DATA_nvps)), axis=1)
