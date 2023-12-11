@@ -25,12 +25,25 @@ Add code to or modify the following files and functions to get a visualization o
 
 1. In [`data_processing.py`](data_processing.py), modify the function `load_data`.
 
-   a.
+   a. In this function, there are code blocks with structure similar to the following. These are used to load and format NVP data from a csv file and compare them. Modify this function as needed to load the correct datasets. An example template is shown below; replace any all-caps variables with your own.
 
-2. In [`data_processing.py`](data_processing.py), modify the function `plot_data`.
+   ```python
+   # load NVPs
+   DATA_raw = pd.read_csv(DATA_FILEPATH)
+   # filter points that are too far
+   DATA_nvps = DATA_raw[["x (ft)", "y (ft)"]].to_numpy()
+   # append column with polar coordinates
+   DATA_nvps = np.concatenate((DATA_nvps, cart_to_polar(DATA_nvps)), axis=1)
+   # sort by angle - largest to smallest
+   DATA_nvps = DATA_nvps[DATA_nvps[:, 3].argsort()[::-1]]
+   ```
 
-   a.
+   Note: More complex data filtering can be done; see [pandas documentation](https://pandas.pydata.org/docs/) or other code blocks in this function for more examples.
 
-3. In [`compare_nvp_area.py`](compare_nvp_area.py) modify the function `main`.
+   b. At the end of this function, modify the variable `datasets` to include only the datasets of interest.
 
-   a.
+2. In [`compare_nvp_area.py`](compare_nvp_area.py) modify the function `main`.
+
+   a. Modify the variable `labels` so that the number and order of the labels match the number and order of the datasets returned from `load_data`.
+
+   b. If there is a ground truth dataset included in the list of datasets, make sure that its label contains the string `Ground Truth` to ensure that it is recognized as a ground truth dataset.
