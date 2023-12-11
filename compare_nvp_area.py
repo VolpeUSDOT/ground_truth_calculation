@@ -2,7 +2,7 @@
 Main file for comparing the NVP area of the different datasets.
 """
 import numpy as np
-from validation_data_processing import load_data, plot_data
+from data_processing import load_data, plot_data
 from helper_functions import get_area, get_distance
 
 
