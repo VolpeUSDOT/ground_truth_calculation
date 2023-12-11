@@ -1,10 +1,27 @@
+"""
+Old Code - Load and process ground truth data for a single vehicle that contains
+    car points, nvp points, and eye points.
+"""
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
 
 def load_data(filepath):
-    """ """
+    """
+    Given a filepath to a ground truth csv file extract the car, nvp, and eye
+    points and process them.
+
+    Args:
+        filepath: a path to a csv file
+    Returns:
+        eye_loc: a numpy array containing the x and y coordinates of the eye point
+            and the r and theta coordinates of the eye point
+        car_points: a numpy array containing the x and y coordinates of the car points
+            and the r and theta coordinates of the car points
+        nvp_points: a numpy array containing the x and y coordinates of the nvp points
+            and the r and theta coordinates of the nvp points
+    """
     df = pd.read_csv(filepath)
 
     eye_loc = df[df["Point"] == "Eye"][["x (in)", "y (in)"]].to_numpy()
@@ -40,7 +57,19 @@ def load_data(filepath):
 
 
 def fix_car_bounds(car_points, nvp_points):
-    """ """
+    """
+    Adjust car points to start and stop at the same angle as the nvp points.
+
+    Args:
+        car_points: a numpy array containing the x and y coordinates of the car points
+            and the r and theta coordinates of the car points
+        nvp_points: a numpy array containing the x and y coordinates of the nvp points
+            and the r and theta coordinates of the nvp points
+    Returns:
+        car_points_trimmed: a numpy array containing the x and y coordinates of the car
+            points and the r and theta coordinates of the car points after fixing
+            bounds
+    """
     car_points_trimmed = trim_car_data(car_points, nvp_points)
 
     left_bound = get_intersection(car_points_trimmed[0:2, :], nvp_points[0, :])
@@ -53,7 +82,19 @@ def fix_car_bounds(car_points, nvp_points):
 
 
 def trim_car_data(car_points, nvp_points):
-    """ """
+    """
+    Trim car points to start just before the first nvp point and stop just after the
+    last nvp point.
+
+    Args:
+        car_points: a numpy array containing the x and y coordinates of the car points
+            and the r and theta coordinates of the car points
+        nvp_points: a numpy array containing the x and y coordinates of the nvp points
+            and the r and theta coordinates of the nvp points
+    Returns:
+        car_points_trimmed: a numpy array containing the x and y coordinates of the car
+            points and the r and theta coordinates of the car points after trimming
+    """
     num_car_points = np.shape(car_points)[0]
 
     leftmost_ang = nvp_points[0, 3]
@@ -73,7 +114,20 @@ def trim_car_data(car_points, nvp_points):
 
 
 def get_intersection(car_pair, nvp_point):
-    """ """
+    """
+    Given an NVP and two points on the car the bound it (one point on the left and
+    one point on the right) find the point of intersection between the line formed
+    by the two car points and the line formed by the NVP and the origin.
+
+    Args:
+        car_pair: a numpy array containing the x and y coordinates of the car points
+            and the r and theta coordinates of the car points
+        nvp_point: a numpy array containing the x and y coordinates of the nvp point
+            and the r and theta coordinates of the nvp point
+    Returns:
+        ordered_pair: a numpy array containing the x and y coordinates of the point
+            of intersection and the r and theta coordinates of the point of intersection
+    """
     car_point1 = car_pair[0]
     car_point2 = car_pair[1]
 
@@ -89,7 +143,14 @@ def get_intersection(car_pair, nvp_point):
 
 
 def cart_to_polar(pts):
-    """ """
+    """
+    Convert a set of points from cartesian coordinates to polar coordinates.
+
+    Args:
+        pts: a numpy array containing the x and y coordinates of the points
+    Returns:
+        res: a numpy array containing the r and theta coordinates of the points
+    """
     x = pts[:, 0]
     y = pts[:, 1]
 
@@ -106,7 +167,20 @@ def cart_to_polar(pts):
 
 
 def plot_data(eye_pt, car_pts, nvp_pts):
-    """ """
+    """
+    Plot eye point, car points, and nvp points on a polar plot and a cartesian plot
+    in different colors.
+
+    Args:
+        eye_pt: a numpy array containing the x and y coordinates of the eye point
+            and the r and theta coordinates of the eye point
+        car_pts: a numpy array containing the x and y coordinates of the car points
+            and the r and theta coordinates of the car points
+        nvp_pts: a numpy array containing the x and y coordinates of the nvp points
+            and the r and theta coordinates of the nvp points
+    Returns:
+        N/A
+    """
     # extract coordinates
     car_x = car_pts[:, 0]
     car_y = car_pts[:, 1]
