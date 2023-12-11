@@ -10,8 +10,9 @@ The purpose of this code is to calculate the blind zone area of a vehicle, given
 
 ### Dependencies
 
-- [Numpy](https://numpy.org/install/)
 - [Matplotlib](https://matplotlib.org/stable/users/installing/index.html)
+- [Numpy](https://numpy.org/install/)
+- [pandas](https://pandas.pydata.org/docs/getting_started/install.html)
 
 ### Adding Data
 
