@@ -46,7 +46,7 @@ Add code to or modify the following files and functions to get a visualization o
 
    - Modify the variable `labels` so that the number and order of the labels match the number and order of the datasets returned from `load_data`.
 
-   - If there is a ground truth dataset included in the list of datasets, make sure that its label contains the string `Ground Truth` to ensure that it is recognized as a ground truth dataset.
+   - If there is a ground truth dataset included in the list of datasets, make sure that its label contains the string `"Ground Truth"` to ensure that it is recognized as a ground truth dataset.
 
 3. Depending on your Python version, run one of the following commands in the terminal at the root level of this repository to run the code.
 
