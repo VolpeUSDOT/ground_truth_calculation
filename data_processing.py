@@ -36,7 +36,7 @@ def load_data():
             & (markerlessrig_nvp[:, 1] < 13.4)
         )
     ]
-    # append column with polar coordinates
+    # append columns with polar coordinates
     markerlessrig_nvp = np.concatenate(
         (markerlessrig_nvp, cart_to_polar(markerlessrig_nvp)), axis=1
     )
@@ -49,7 +49,7 @@ def load_data():
     view1rig_nvp = view1rig_data_raw[view1rig_data_raw["NVP (in)"] != 438][
         ["x (ft)", "y (ft)"]
     ].to_numpy()
-    # append column with polar coordinates
+    # append columns with polar coordinates
     view1rig_nvp = np.concatenate((view1rig_nvp, cart_to_polar(view1rig_nvp)), axis=1)
     # sort by angle - largest to smallest
     view1rig_nvp = view1rig_nvp[view1rig_nvp[:, 3].argsort()[::-1]]
@@ -60,7 +60,7 @@ def load_data():
     lidarrig_nvp = lidarrig_data_raw[(abs(lidarrig_data_raw["x (ft)"]) <= 40)][
         ["x (ft)", "y (ft)"]
     ].to_numpy()
-    # append column with polar coordinates
+    # append columns with polar coordinates
     lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
     # sort by angle - largest to smallest
     lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
@@ -80,7 +80,7 @@ def load_data():
     )
     # flip across x-axis to match orientation of other datasets
     groundrig_nvp[:, 1] = groundrig_nvp[:, 1] * -1
-    # append column with polar coordinates
+    # append columns with polar coordinates
     groundrig_nvp = np.concatenate(
         (groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1
     )
