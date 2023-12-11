@@ -2,6 +2,10 @@
 
 ## Description
 
+This code repository is part of [Olin College of Engineering's 2023-2024 Santos-Volpe SCOPE project](https://www.olin.edu/research/view-20-direct-vision-assessment-system).
+
+The purpose of this code is to calculate the blind zone area of a vehicle, given a dataset of nearest visible points (NVPs) for that vehicle.
+
 ## Setup
 
 ### Dependencies
@@ -19,4 +23,14 @@
 
 Add code to or modify the following files and functions to get a visualization of your NVPs and a value for the blind zone area.
 
-1. In [`data_processing.py`](data_processing.py)
+1. In [`data_processing.py`](data_processing.py), modify the function `load_data`.
+
+   a.
+
+2. In [`data_processing.py`](data_processing.py), modify the function `plot_data`.
+
+   a.
+
+3. In [`compare_nvp_area.py`](compare_nvp_area.py) modify the function `main`.
+
+   a.
