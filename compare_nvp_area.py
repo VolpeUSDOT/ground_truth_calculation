@@ -42,9 +42,16 @@ def main():
             nvp_area += triangle_area
         nvp_areas.append(nvp_area)
 
+    # determine if there is a ground truth dataset
+    ground_truth_is_present = False
+    for label in labels:
+        if "Ground Truth" in label:
+            ground_truth_is_present = True
+            break
+
     # print the shadow area of each dataset and the percent error from the ground truth
     for i, label in enumerate(labels):
-        if "Ground Truth" not in label:
+        if ground_truth_is_present and "Ground Truth" not in label:
             print(
                 f"NVP Area for {label}: {nvp_areas[i]} sq. ft. Percent Error: {((nvp_areas[i] - nvp_areas[-1]) / nvp_areas[-1]) * 100: .2f}%"
             )
