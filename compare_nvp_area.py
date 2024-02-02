@@ -19,7 +19,7 @@ def main():
     datasets = load_data()
 
     # modify these labels to match the datasets that are returned from load_data()
-    labels = ["Markerless Rig", "VIEW 1.0 Rig", "Lidar Rig", "Ground Truth Rig"]
+    labels = ["Ford Markerless", "Ford Lidar", "Ford Ground Truth"]
 
     eye_point = np.array([[0, 0]])
     nvp_areas = []

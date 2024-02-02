@@ -20,74 +20,106 @@ def load_data():
         datasets: a list of numpy arrays containing the x and y coordinates of the NVPs
             which have been trimmed to start and stop at the same angles
     """
-    # load and process markerless - with rig
-    markerlessrig_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessRig.csv")
-    # filter point that are too far and translate to be centered at the eye point
-    markerlessrig_nvp = markerlessrig_data_raw[
-        (abs(markerlessrig_data_raw["x (ft)"]) <= 40)
-        & (abs(markerlessrig_data_raw["y (ft)"]) <= 20)
-    ][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.8542, -7.5208]])
-    # filter points that are in small a-pillar window
-    markerlessrig_nvp = markerlessrig_nvp[
-        ~(
-            (markerlessrig_nvp[:, 0] > 13.5)
-            & (markerlessrig_nvp[:, 0] < 15.7)
-            & (markerlessrig_nvp[:, 1] > 9.5)
-            & (markerlessrig_nvp[:, 1] < 13.4)
-        )
-    ]
-    # append columns with polar coordinates
-    markerlessrig_nvp = np.concatenate(
-        (markerlessrig_nvp, cart_to_polar(markerlessrig_nvp)), axis=1
-    )
-    # sort by angle - largest to smallest
-    markerlessrig_nvp = markerlessrig_nvp[markerlessrig_nvp[:, 3].argsort()[::-1]]
+    # # load and process markerless - with rig
+    # markerlessrig_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessRig.csv")
+    # # filter point that are too far and translate to be centered at the eye point
+    # markerlessrig_nvp = markerlessrig_data_raw[
+    #     (abs(markerlessrig_data_raw["x (ft)"]) <= 40)
+    #     & (abs(markerlessrig_data_raw["y (ft)"]) <= 20)
+    # ][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.8542, -7.5208]])
+    # # filter points that are in small a-pillar window
+    # markerlessrig_nvp = markerlessrig_nvp[
+    #     ~(
+    #         (markerlessrig_nvp[:, 0] > 13.5)
+    #         & (markerlessrig_nvp[:, 0] < 15.7)
+    #         & (markerlessrig_nvp[:, 1] > 9.5)
+    #         & (markerlessrig_nvp[:, 1] < 13.4)
+    #     )
+    # ]
+    # # append columns with polar coordinates
+    # markerlessrig_nvp = np.concatenate(
+    #     (markerlessrig_nvp, cart_to_polar(markerlessrig_nvp)), axis=1
+    # )
+    # # sort by angle - largest to smallest
+    # markerlessrig_nvp = markerlessrig_nvp[markerlessrig_nvp[:, 3].argsort()[::-1]]
 
-    # load and process view1.0 rig nvps
-    view1rig_data_raw = pd.read_csv("./Data/HondaOdysseyVIEW1.0Rig.csv")
-    # filter points that are too far
-    view1rig_nvp = view1rig_data_raw[view1rig_data_raw["NVP (in)"] != 438][
-        ["x (ft)", "y (ft)"]
-    ].to_numpy()
-    # append columns with polar coordinates
-    view1rig_nvp = np.concatenate((view1rig_nvp, cart_to_polar(view1rig_nvp)), axis=1)
-    # sort by angle - largest to smallest
-    view1rig_nvp = view1rig_nvp[view1rig_nvp[:, 3].argsort()[::-1]]
+    # # load and process view1.0 rig nvps
+    # view1rig_data_raw = pd.read_csv("./Data/HondaOdysseyVIEW1.0Rig.csv")
+    # # filter points that are too far
+    # view1rig_nvp = view1rig_data_raw[view1rig_data_raw["NVP (in)"] != 438][
+    #     ["x (ft)", "y (ft)"]
+    # ].to_numpy()
+    # # append columns with polar coordinates
+    # view1rig_nvp = np.concatenate((view1rig_nvp, cart_to_polar(view1rig_nvp)), axis=1)
+    # # sort by angle - largest to smallest
+    # view1rig_nvp = view1rig_nvp[view1rig_nvp[:, 3].argsort()[::-1]]
 
-    # load and process lidar nvps with rig setup
-    lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
-    # filter points that are too far
-    lidarrig_nvp = lidarrig_data_raw[(abs(lidarrig_data_raw["x (ft)"]) <= 40)][
-        ["x (ft)", "y (ft)"]
-    ].to_numpy()
-    # append columns with polar coordinates
-    lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
-    # sort by angle - largest to smallest
-    lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
+    # # load and process lidar nvps with rig setup
+    # lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
+    # # filter points that are too far
+    # lidarrig_nvp = lidarrig_data_raw[(abs(lidarrig_data_raw["x (ft)"]) <= 40)][
+    #     ["x (ft)", "y (ft)"]
+    # ].to_numpy()
+    # # append columns with polar coordinates
+    # lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
+    # # sort by angle - largest to smallest
+    # lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
 
-    # load and process ground truth rig nvps
-    groundrig_data_raw = pd.read_csv("./Data/HondaOdysseyGroundTruthRig.csv")
-    # select eye point
-    groundrig_eye_loc = groundrig_data_raw[groundrig_data_raw["Point"] == "Eye"][
-        ["x (ft)", "y (ft)"]
-    ].to_numpy()
-    # select car points and translate to be centered at the eye point
-    groundrig_nvp = (
-        groundrig_data_raw[groundrig_data_raw["Point"] == "Car"][
-            ["x (ft)", "y (ft)"]
-        ].to_numpy()
-        - groundrig_eye_loc
-    )
-    # flip across x-axis to match orientation of other datasets
-    groundrig_nvp[:, 1] = groundrig_nvp[:, 1] * -1
-    # append columns with polar coordinates
-    groundrig_nvp = np.concatenate(
-        (groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1
-    )
-    # sort by angle - largest to smallest
-    groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
+    # # load and process ground truth rig nvps
+    # groundrig_data_raw = pd.read_csv("./Data/HondaOdysseyGroundTruthRig.csv")
+    # # select eye point
+    # groundrig_eye_loc = groundrig_data_raw[groundrig_data_raw["Point"] == "Eye"][
+    #     ["x (ft)", "y (ft)"]
+    # ].to_numpy()
+    # # select car points and translate to be centered at the eye point
+    # groundrig_nvp = (
+    #     groundrig_data_raw[groundrig_data_raw["Point"] == "Car"][
+    #         ["x (ft)", "y (ft)"]
+    #     ].to_numpy()
+    #     - groundrig_eye_loc
+    # )
+    # # flip across x-axis to match orientation of other datasets
+    # groundrig_nvp[:, 1] = groundrig_nvp[:, 1] * -1
+    # # append columns with polar coordinates
+    # groundrig_nvp = np.concatenate(
+    #     (groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1
+    # )
+    # # sort by angle - largest to smallest
+    # groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
 
-    datasets = [markerlessrig_nvp, view1rig_nvp, lidarrig_nvp, groundrig_nvp]
+    
+    ford_ground_data_raw = pd.read_csv("./Data/FordF450GroundTruth.csv")
+    ford_ground_data_nvp = ford_ground_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    ford_ground_data_nvp = np.concatenate((ford_ground_data_nvp, cart_to_polar(ford_ground_data_nvp)), axis=1)
+    ford_ground_data_nvp = ford_ground_data_nvp[ford_ground_data_nvp[:, 3].argsort()[::-1]]
+
+    ford_lidar_data_raw = pd.read_csv("./Data/FordF450Lidar.csv")
+    ford_lidar_data_nvp = ford_lidar_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    ford_lidar_data_nvp = np.concatenate((ford_lidar_data_nvp, cart_to_polar(ford_lidar_data_nvp)), axis=1)
+    ford_lidar_data_nvp = ford_lidar_data_nvp[ford_lidar_data_nvp[:, 3].argsort()[::-1]]
+
+    ford_markerless_data_raw = pd.read_csv("./Data/FordF450Markerless.csv")
+    ford_markerless_data_nvp = ford_markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    ford_markerless_data_nvp = np.concatenate((ford_markerless_data_nvp, cart_to_polar(ford_markerless_data_nvp)), axis=1)
+    ford_markerless_data_nvp = ford_markerless_data_nvp[ford_markerless_data_nvp[:, 3].argsort()[::-1]]
+    
+    # attenuator_ground_data_raw = pd.read_csv("./Data/AttenuatorGroundTruth.csv")
+    # attenuator_ground_data_nvp = attenuator_ground_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_ground_data_nvp = np.concatenate((attenuator_ground_data_nvp, cart_to_polar(attenuator_ground_data_nvp)), axis=1)
+    # attenuator_ground_data_nvp = attenuator_ground_data_nvp[attenuator_ground_data_nvp[:, 3].argsort()[::-1]]
+
+    # attenuator_lidar_data_raw = pd.read_csv("./Data/AttenuatorLidar.csv")
+    # attenuator_lidar_data_nvp = attenuator_lidar_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_lidar_data_nvp = np.concatenate((attenuator_lidar_data_nvp, cart_to_polar(attenuator_lidar_data_nvp)), axis=1)
+    # attenuator_lidar_data_nvp = attenuator_lidar_data_nvp[attenuator_lidar_data_nvp[:, 3].argsort()[::-1]]
+
+    # attenuator_markerless_data_raw = pd.read_csv("./Data/AttenuatorMarkerless.csv")
+    # attenuator_markerless_data_nvp = attenuator_markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_markerless_data_nvp = np.concatenate((attenuator_markerless_data_nvp, cart_to_polar(attenuator_markerless_data_nvp)), axis=1)
+    # attenuator_markerless_data_nvp = attenuator_markerless_data_nvp[attenuator_markerless_data_nvp[:, 3].argsort()[::-1]]
+
+
+    datasets = [ford_markerless_data_nvp, ford_lidar_data_nvp, ford_ground_data_nvp]
     left_bound, right_bound = get_left_and_right_bound(datasets)
 
     return trim_datasets(datasets, left_bound, right_bound)
