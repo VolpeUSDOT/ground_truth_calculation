@@ -99,7 +99,7 @@ def load_data():
     ford_lidar_data_nvp = ford_lidar_data_nvp[ford_lidar_data_nvp[:, 3].argsort()[::-1]]
 
     ford_markerless_data_raw = pd.read_csv("./Data/FordF450Markerless.csv")
-    ford_markerless_data_nvp = ford_markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    ford_markerless_data_nvp = ford_markerless_data_raw[(abs(ford_markerless_data_raw["x (ft)"]) <= 130)][["x (ft)", "y (ft)"]].to_numpy()
     ford_markerless_data_nvp = np.concatenate((ford_markerless_data_nvp, cart_to_polar(ford_markerless_data_nvp)), axis=1)
     ford_markerless_data_nvp = ford_markerless_data_nvp[ford_markerless_data_nvp[:, 3].argsort()[::-1]]
     
@@ -109,7 +109,7 @@ def load_data():
     # attenuator_ground_data_nvp = attenuator_ground_data_nvp[attenuator_ground_data_nvp[:, 3].argsort()[::-1]]
 
     # attenuator_lidar_data_raw = pd.read_csv("./Data/AttenuatorLidar.csv")
-    # attenuator_lidar_data_nvp = attenuator_lidar_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_lidar_data_nvp = attenuator_lidar_data_raw[((abs(attenuator_lidar_data_raw["x (ft)"]) <= 50) & (abs(attenuator_lidar_data_raw["y (ft)"]) <= 30))][["x (ft)", "y (ft)"]].to_numpy()
     # attenuator_lidar_data_nvp = np.concatenate((attenuator_lidar_data_nvp, cart_to_polar(attenuator_lidar_data_nvp)), axis=1)
     # attenuator_lidar_data_nvp = attenuator_lidar_data_nvp[attenuator_lidar_data_nvp[:, 3].argsort()[::-1]]
 
@@ -120,6 +120,7 @@ def load_data():
 
 
     datasets = [ford_markerless_data_nvp, ford_lidar_data_nvp, ford_ground_data_nvp]
+    # datasets = [attenuator_markerless_data_nvp, attenuator_lidar_data_nvp, attenuator_ground_data_nvp]
     left_bound, right_bound = get_left_and_right_bound(datasets)
 
     return trim_datasets(datasets, left_bound, right_bound)
@@ -221,7 +222,7 @@ def plot_data(datasets, names):
     Returns:
         N/A
     """
-    colors = ["#ED037C", "#00458C", "#C0D028", "g", "c", "r"]
+    colors = ["#ED037C", "#C0D028", "#00458C", "g", "c", "r"]
     shapes = ["o", "v", "s", "D", "P", "X", "d", "p", "x", "h", "8"]
 
     fig = plt.figure()
@@ -246,9 +247,14 @@ def plot_data(datasets, names):
 
     ax.grid(True)
     ax.legend(names)
+    # Freight Liner Axis Limits
+    # ax.set_ylim([-2, 25])
+    # Ford Axis Limits
+    # ax.set_ylim([-10, 150])
     ax.axvline(x=0, ymin=0, ymax=1, c="k")
     ax.axhline(y=0, xmin=0, xmax=1, c="k")
-    ax.set_title("NVPs with Eye Point as Origin")
+    # ax.set_title("Freight Liner NVPs with Eye Point as Origin")
+    ax.set_title("Ford F450 NVPs with Eye Point as Origin")
     ax.set_xlabel("x-Direction (ft)")
     ax.set_ylabel("y-Direction (ft)")
     ax.axis("square")

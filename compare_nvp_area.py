@@ -19,6 +19,7 @@ def main():
     datasets = load_data()
 
     # modify these labels to match the datasets that are returned from load_data()
+    # labels = ["Freight Liner Markerless", "Freight Liner Lidar", "Freight Liner Ground Truth"]
     labels = ["Ford Markerless", "Ford Lidar", "Ford Ground Truth"]
 
     eye_point = np.array([[0, 0]])
