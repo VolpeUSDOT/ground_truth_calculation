@@ -1,139 +1,262 @@
+"""
+File containing functions to load and process the NVP data from csv files.
+"""
 import pandas as pd
+import matplotlib.pylab as plt
 import numpy as np
-from matplotlib import pyplot as plt
 
-def load_data(filepath):
+from helper_functions import cart_to_polar, get_intersection
+
+
+def load_data():
     """
+    Helper function to load data from csv files and process them into numpy arrays.
+    If the data is not centered at the eye point, it will be shifted to be centered
+    at the eye point.
+
+    Args:
+        N/A
+    Returns:
+        datasets: a list of numpy arrays containing the x and y coordinates of the NVPs
+            which have been trimmed to start and stop at the same angles
+    """
+    # # load and process markerless - with rig
+    # markerlessrig_data_raw = pd.read_csv("./Data/HondaOdysseyMarkerlessRig.csv")
+    # # filter point that are too far and translate to be centered at the eye point
+    # markerlessrig_nvp = markerlessrig_data_raw[
+    #     (abs(markerlessrig_data_raw["x (ft)"]) <= 40)
+    #     & (abs(markerlessrig_data_raw["y (ft)"]) <= 20)
+    # ][["x (ft)", "y (ft)"]].to_numpy() - np.array([[1.8542, -7.5208]])
+    # # filter points that are in small a-pillar window
+    # markerlessrig_nvp = markerlessrig_nvp[
+    #     ~(
+    #         (markerlessrig_nvp[:, 0] > 13.5)
+    #         & (markerlessrig_nvp[:, 0] < 15.7)
+    #         & (markerlessrig_nvp[:, 1] > 9.5)
+    #         & (markerlessrig_nvp[:, 1] < 13.4)
+    #     )
+    # ]
+    # # append columns with polar coordinates
+    # markerlessrig_nvp = np.concatenate(
+    #     (markerlessrig_nvp, cart_to_polar(markerlessrig_nvp)), axis=1
+    # )
+    # # sort by angle - largest to smallest
+    # markerlessrig_nvp = markerlessrig_nvp[markerlessrig_nvp[:, 3].argsort()[::-1]]
+
+    # # load and process view1.0 rig nvps
+    # view1rig_data_raw = pd.read_csv("./Data/HondaOdysseyVIEW1.0Rig.csv")
+    # # filter points that are too far
+    # view1rig_nvp = view1rig_data_raw[view1rig_data_raw["NVP (in)"] != 438][
+    #     ["x (ft)", "y (ft)"]
+    # ].to_numpy()
+    # # append columns with polar coordinates
+    # view1rig_nvp = np.concatenate((view1rig_nvp, cart_to_polar(view1rig_nvp)), axis=1)
+    # # sort by angle - largest to smallest
+    # view1rig_nvp = view1rig_nvp[view1rig_nvp[:, 3].argsort()[::-1]]
+
+    # # load and process lidar nvps with rig setup
+    # lidarrig_data_raw = pd.read_csv("./Data/HondaOdysseyLidarRig.csv")
+    # # filter points that are too far
+    # lidarrig_nvp = lidarrig_data_raw[(abs(lidarrig_data_raw["x (ft)"]) <= 40)][
+    #     ["x (ft)", "y (ft)"]
+    # ].to_numpy()
+    # # append columns with polar coordinates
+    # lidarrig_nvp = np.concatenate((lidarrig_nvp, cart_to_polar(lidarrig_nvp)), axis=1)
+    # # sort by angle - largest to smallest
+    # lidarrig_nvp = lidarrig_nvp[lidarrig_nvp[:, 3].argsort()[::-1]]
+
+    # # load and process ground truth rig nvps
+    # groundrig_data_raw = pd.read_csv("./Data/HondaOdysseyGroundTruthRig.csv")
+    # # select eye point
+    # groundrig_eye_loc = groundrig_data_raw[groundrig_data_raw["Point"] == "Eye"][
+    #     ["x (ft)", "y (ft)"]
+    # ].to_numpy()
+    # # select car points and translate to be centered at the eye point
+    # groundrig_nvp = (
+    #     groundrig_data_raw[groundrig_data_raw["Point"] == "Car"][
+    #         ["x (ft)", "y (ft)"]
+    #     ].to_numpy()
+    #     - groundrig_eye_loc
+    # )
+    # # flip across x-axis to match orientation of other datasets
+    # groundrig_nvp[:, 1] = groundrig_nvp[:, 1] * -1
+    # # append columns with polar coordinates
+    # groundrig_nvp = np.concatenate(
+    #     (groundrig_nvp, cart_to_polar(groundrig_nvp)), axis=1
+    # )
+    # # sort by angle - largest to smallest
+    # groundrig_nvp = groundrig_nvp[groundrig_nvp[:, 3].argsort()[::-1]]
+
     
-    """
-    df = pd.read_csv(filepath)
+    ford_ground_data_raw = pd.read_csv("./Data/FordF450GroundTruth.csv")
+    ford_ground_data_nvp = ford_ground_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    ford_ground_data_nvp = np.concatenate((ford_ground_data_nvp, cart_to_polar(ford_ground_data_nvp)), axis=1)
+    ford_ground_data_nvp = ford_ground_data_nvp[ford_ground_data_nvp[:, 3].argsort()[::-1]]
 
-    eye_loc = df[df["Point"] == "Eye"][["x (in)", "y (in)"]].to_numpy()
+    ford_lidar_data_raw = pd.read_csv("./Data/FordF450Lidar.csv")
+    ford_lidar_data_nvp = ford_lidar_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    ford_lidar_data_nvp = np.concatenate((ford_lidar_data_nvp, cart_to_polar(ford_lidar_data_nvp)), axis=1)
+    ford_lidar_data_nvp = ford_lidar_data_nvp[ford_lidar_data_nvp[:, 3].argsort()[::-1]]
 
-    # extract points and make eye as origin
-    car_points = df[df["Point"].str.contains("Car")][["x (in)", "y (in)"]].to_numpy() - eye_loc
-    nvp_points = df[df["Point"].str.contains("Car|Eye") == False][["x (in)", "y (in)"]].to_numpy() - eye_loc
-    eye_loc -= eye_loc
-
-    # flip y-coordinate to reflect across x-axis
-    car_points[:, 1] = car_points[:, 1] * -1
-    nvp_points[:, 1] = nvp_points[:, 1] * -1
-    eye_loc[:, 1] = eye_loc[:, 1] * -1
+    ford_markerless_data_raw = pd.read_csv("./Data/FordF450Markerless.csv")
+    ford_markerless_data_nvp = ford_markerless_data_raw[(abs(ford_markerless_data_raw["x (ft)"]) <= 130)][["x (ft)", "y (ft)"]].to_numpy()
+    ford_markerless_data_nvp = np.concatenate((ford_markerless_data_nvp, cart_to_polar(ford_markerless_data_nvp)), axis=1)
+    ford_markerless_data_nvp = ford_markerless_data_nvp[ford_markerless_data_nvp[:, 3].argsort()[::-1]]
     
-    # add two more columns of each set of points in polar
-    car_points = np.concatenate((car_points, cart_to_polar(car_points)), axis=1)
-    nvp_points = np.concatenate((nvp_points, cart_to_polar(nvp_points)), axis=1)
-    eye_loc = np.concatenate((eye_loc, cart_to_polar(eye_loc)), axis=1)
+    # attenuator_ground_data_raw = pd.read_csv("./Data/AttenuatorGroundTruth.csv")
+    # attenuator_ground_data_nvp = attenuator_ground_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_ground_data_nvp = np.concatenate((attenuator_ground_data_nvp, cart_to_polar(attenuator_ground_data_nvp)), axis=1)
+    # attenuator_ground_data_nvp = attenuator_ground_data_nvp[attenuator_ground_data_nvp[:, 3].argsort()[::-1]]
 
-    # sort each matrix by theta (last col of points matrix)
-    car_points = car_points[car_points[:, 3].argsort()[::-1]]
-    nvp_points = nvp_points[nvp_points[:, 3].argsort()[::-1]]
-    eye_loc = eye_loc[eye_loc[:, 3].argsort()[::-1]]
+    # attenuator_lidar_data_raw = pd.read_csv("./Data/AttenuatorLidar.csv")
+    # attenuator_lidar_data_nvp = attenuator_lidar_data_raw[((abs(attenuator_lidar_data_raw["x (ft)"]) <= 50) & (abs(attenuator_lidar_data_raw["y (ft)"]) <= 30))][["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_lidar_data_nvp = np.concatenate((attenuator_lidar_data_nvp, cart_to_polar(attenuator_lidar_data_nvp)), axis=1)
+    # attenuator_lidar_data_nvp = attenuator_lidar_data_nvp[attenuator_lidar_data_nvp[:, 3].argsort()[::-1]]
 
-    return eye_loc, car_points, nvp_points
+    # attenuator_markerless_data_raw = pd.read_csv("./Data/AttenuatorMarkerless.csv")
+    # attenuator_markerless_data_nvp = attenuator_markerless_data_raw[["x (ft)", "y (ft)"]].to_numpy()
+    # attenuator_markerless_data_nvp = np.concatenate((attenuator_markerless_data_nvp, cart_to_polar(attenuator_markerless_data_nvp)), axis=1)
+    # attenuator_markerless_data_nvp = attenuator_markerless_data_nvp[attenuator_markerless_data_nvp[:, 3].argsort()[::-1]]
 
-def fix_car_bounds(car_points, nvp_points):
+
+    datasets = [ford_markerless_data_nvp, ford_lidar_data_nvp, ford_ground_data_nvp]
+    # datasets = [attenuator_markerless_data_nvp, attenuator_lidar_data_nvp, attenuator_ground_data_nvp]
+    left_bound, right_bound = get_left_and_right_bound(datasets)
+
+    return trim_datasets(datasets, left_bound, right_bound)
+
+
+def get_left_and_right_bound(datasets):
     """
-    
+    Find the starting and stopping points for each dataset in a list of NVPs.
+
+    Args:
+        datasets: a list of numpy arrays containing the x and y coordinates of the NVPs
+    Returns:
+        left: a numpy array containing the x and y coordinates of the point with the
+            largest starting angle for each dataset
+        right: a numpy array containing the x and y coordinates of the point with the
+            smallest ending angle for each dataset
     """
-    car_points_trimmed = trim_car_data(car_points, nvp_points)
+    leftmost_points = [dataset[0, :] for dataset in datasets]
+    rightmost_points = [dataset[-1, :] for dataset in datasets]
 
-    left_bound = get_intersection(car_points_trimmed[0:2, :], nvp_points[0, :])
-    right_bound = get_intersection(car_points_trimmed[-2:, :], nvp_points[-1, :])
-    
-    car_points_trimmed[0, :] = left_bound
-    car_points_trimmed[-1, :] = right_bound
+    left = min(leftmost_points, key=lambda x: x[3])
+    right = max(rightmost_points, key=lambda x: x[3])
 
-    return car_points_trimmed
+    return left, right
 
-def trim_car_data(car_points, nvp_points):
+
+def trim_datasets(datasets, left_bound, right_bound):
     """
-    
+    Trim a list of datasets to start and stop at the same angle.
+
+    Args:
+        datasets: a list of numpy arrays containing the x and y coordinates of the NVPs
+        left_bound: a numpy array containing the x and y coordinates of the
+            point with the smallest starting angle
+        right_bound: a numpy array containing the x and y coordinates of the
+            point with the largest ending angle
+    Returns:
+        res: a list of numpy arrays containing the x and y coordinates of the NVPs
+            which have been adjusted to start and stop at the same angles
     """
-    num_car_points = np.shape(car_points)[0]
+    res = []
 
-    leftmost_ang = nvp_points[0, 3]
-    rightmost_ang = nvp_points[-1, 3]
+    # loop through the datasets
+    for dataset in datasets:
+        # for each dataset, find the index of the point that is just outside the
+        # left bound and the point that is just outside the right bound
 
-    left_bound_index = None
-    right_bound_index = None
-    for i in range(num_car_points):
-        if car_points[i, 3] < leftmost_ang and left_bound_index is None:
-            left_bound_index = i
-        if car_points[i, 3] < rightmost_ang and right_bound_index is None:
-            right_bound_index = i
-    
-    car_points_trimmed = car_points[left_bound_index - 1 : right_bound_index + 1, :]
+        # if the first point is not the left bound, loop through the points and
+        # find the first point that is just outside the left bound
+        if not np.array_equal(dataset[0, :], left_bound):
+            left_ind = None
+            for i, point in enumerate(dataset):
+                if left_ind is None or point[3] > left_bound[3]:
+                    left_ind = i
+                else:
+                    break
+        else:
+            left_ind = 0
 
-    return car_points_trimmed
+        # if the last point is not the right bound, loop through the points and
+        # find the last point that is just outside the right bound
+        if not np.array_equal(dataset[-1, :], right_bound):
+            right_ind = None
+            for i, point in enumerate(dataset[::-1]):
+                if right_ind is None or point[3] < right_bound[3]:
+                    right_ind = len(dataset) - i
+                else:
+                    break
+        else:
+            right_ind = -1
 
-def get_intersection(car_pair, nvp_point):
+        # create copy of the dataset that starts and stops just outside or equal to the bounds
+        new_dataset = dataset[left_ind:right_ind, :]
+
+        # if the first point is not the left bound, replace the first point with
+        # the point at the intersection of the left bound angle and the two points
+        # bounding it from the dataset
+        if not np.array_equal(dataset[0, :], left_bound):
+            new_dataset[0, :] = get_intersection(new_dataset[0:2, :], left_bound)
+
+        # if the last point is not the right bound, replace the last point with
+        # the point at the intersection of the right bound angle and the two points
+        # bounding it from the dataset
+        if not np.array_equal(dataset[-1, :], right_bound):
+            new_dataset[-1, :] = get_intersection(new_dataset[-2:, :], right_bound)
+
+        res.append(new_dataset)
+
+    return res
+
+
+def plot_data(datasets, names):
     """
-    
+    Create a scatterplot of overlaid NVPs.
+
+    Args:
+        datasets: a list of numpy arrays containing the x and y coordinates of the NVPs
+        names: a list of strings containing the names of the datasets
+    Returns:
+        N/A
     """
-    car_point1 = car_pair[0]
-    car_point2 = car_pair[1]
+    colors = ["#ED037C", "#C0D028", "#00458C", "g", "c", "r"]
+    shapes = ["o", "v", "s", "D", "P", "X", "d", "p", "x", "h", "8"]
 
-    car_slope = (car_point2[1] - car_point1[1]) / (car_point2[0] - car_point1[0])
-    nvp_slope = nvp_point[1] / nvp_point[0]
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
 
-    x_int = ((car_slope * car_point1[0]) - car_point1[1]) / (car_slope - nvp_slope)
-    y_int = nvp_slope * x_int
+    num_sets = len(datasets)
+    # iterate through each dataset
+    for i in range(num_sets):
+        # if the corresponding name contains "Ground Truth", make the color black
+        # else loop through the colors
+        if "Ground Truth" in names[i]:
+            color = "#000000"
+        else:
+            color = colors[i % len(colors)]
+        ax.scatter(
+            datasets[i][:, 0],
+            datasets[i][:, 1],
+            s=10,
+            c=color,
+            marker=shapes[i % len(shapes)],
+        )
 
-    ordered_pair = np.array([[x_int, y_int]])
-
-    return np.concatenate((ordered_pair, cart_to_polar(ordered_pair)), axis=1)
-
-def cart_to_polar(pts):
-    """
-    
-    """
-    x = pts[:, 0]
-    y = pts[:, 1]
-
-    r = np.sqrt(np.square(x) + np.square(y)).reshape((np.shape(pts)[0], -1))
-    
-    # angles in quad 1 and 2 are pos, angles in quad 3 and 4 are neg
-    theta = np.arctan2(y, x).reshape((np.shape(pts)[0], -1)) # radians
-
-    # make values in the third quadrant positive so that sorting points wraps
-    # from back of car clockwise after sorting points by angle 
-    theta += np.ones((np.shape(theta)[0], 1)) * 2 * np.pi * (theta < -np.pi / 2)
-
-    return np.concatenate((r, theta), axis=1)
-
-def plot_data(eye_pt, car_pts, nvp_pts):
-    """
-    
-    """
-    # extract coordinates
-    car_x = car_pts[:, 0] 
-    car_y = car_pts[:, 1]
-    nvp_x = nvp_pts[:, 0]
-    nvp_y = nvp_pts[:, 1]
-    eye_x = eye_pt[:, 0]
-    eye_y = eye_pt[:, 1]
-
-    car_r = car_pts[:, 2] 
-    car_theta = car_pts[:, 3]
-    nvp_r = nvp_pts[:, 2]
-    nvp_theta = nvp_pts[:, 3]
-    eye_r = eye_pt[:, 2]
-    eye_theta = eye_pt[:, 3]
-
-    fig1 = plt.figure(figsize=(10, 5))
-    ax_pol = fig1.add_subplot(121, projection="polar")
-    ax_pol.scatter(nvp_theta, nvp_r, c="#00ff00")
-    ax_pol.scatter(car_theta, car_r, c="#ff0000")
-    ax_pol.scatter(eye_theta, eye_r, c="#0000ff")
-
-    ax_cart = fig1.add_subplot(122)
-    ax_cart.scatter(nvp_x, nvp_y, c="#00ff00")
-    ax_cart.scatter(car_x, car_y, c="#ff0000")
-    ax_cart.scatter(eye_x, eye_y, c="#0000ff")
-    ax_cart.set_aspect("equal", "box")
-    
+    ax.grid(True)
+    ax.legend(names)
+    # Freight Liner Axis Limits
+    # ax.set_ylim([-2, 25])
+    # Ford Axis Limits
+    # ax.set_ylim([-10, 150])
+    ax.axvline(x=0, ymin=0, ymax=1, c="k")
+    ax.axhline(y=0, xmin=0, xmax=1, c="k")
+    # ax.set_title("Freight Liner NVPs with Eye Point as Origin")
+    ax.set_title("Ford F450 NVPs with Eye Point as Origin")
+    ax.set_xlabel("x-Direction (ft)")
+    ax.set_ylabel("y-Direction (ft)")
+    ax.axis("square")
+    fig.tight_layout()
     plt.show()
-    
-
-
