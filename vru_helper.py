@@ -226,14 +226,11 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
       Begin note minimum distance from hood to VRU in front of driver
       ------------------------------------------------------------'''
         # find nvp in front of driver (with tolerance)
-        # b/w 88 and 92deg (taking ind0 since returns array inside variable)
+        # b/w 85 and 95deg (taking ind0 since returns array inside variable)
         front_range_indices = np.where(np.logical_and(
-            theta_sorted >= (mth.pi/2)-mth.radians(2),
-            theta_sorted <= (mth.pi/2)+mth.radians(2)))[0]
-        # find index of minimum of selected entries
-        # if round(vehicle_area, 13) == -57.8129665481776:
-        #     import pdb
-        #     pdb.set_trace()        
+            theta_sorted >= (mth.pi/2)-mth.radians(5),
+            theta_sorted <= (mth.pi/2)+mth.radians(5)))[0]
+        # find index of minimum of selected entries      
         front_r_min_index = front_range_indices[np.argmin(
             r_sorted[front_range_indices])]
         # print("r_sorted", r_sorted[front_range_indices])
@@ -263,9 +260,9 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
       Begin note minimum distance from eyepoint to VRU on passenger side
       ------------------------------------------------------------'''
         # find nvp in passenger side of driver (with tolerance)
-        # b/w 0 and 2 deg (taking ind0 since returns array inside variable)
+        # b/w -2 and 2 deg (taking ind0 since returns array inside variable)
         passenger_range_indices = np.where(np.logical_and(
-            theta_sorted >= 0,
+            theta_sorted >= mth.radians(-2),
             theta_sorted <= mth.radians(2)))[0]
         # find index of minimum of selected entries
         passenger_r_min_index = passenger_range_indices[np.argmin(
@@ -339,7 +336,7 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
    # return data, closest_forward_vrus, num_vrus_in_vru_nvp_area
     return closest_forward_vrus, closest_passenger_vrus, num_vrus_in_vru_nvp_area, vru_nvp_areas
 
-def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col: str = 'FileName - 20 m') -> pd.DataFrame:
+def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col: str, forward_line: gpd.GeoDataFrame, passenger_line: gpd.GeoDataFrame) -> pd.DataFrame:
     # loop through markerless data, join with shapefiles
     n = 1
     num_files = len(markerless_data[filename_col])
@@ -356,15 +353,28 @@ def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col:
             
             #read shapefile, save lat/lon into pandas df
             data = gpd.read_file(datafile)
+
             poly_mapped = mapping(data)
             poly_coordinates = poly_mapped['features'][0]['geometry']['coordinates'][0]
             lats = [coords[1] for coords in poly_coordinates]
             lons = [coords[0] for coords in poly_coordinates]
+
+            # Tries to calculate actual location of front and pass side NVP if enough points exist to do so
+            forward_int = data.geometry.intersection(forward_line[0], align = False)
+            if len(forward_int.get_coordinates(ignore_index=True).values) > 0:
+                f_lat, f_lon = forward_int.get_coordinates(ignore_index=True).values[1]
+                lats.append(f_lat)
+                lons.append(f_lon)
+            
+            passenger_int = data.geometry.intersection(passenger_line[0], align = False)
+            if len(passenger_int.get_coordinates(ignore_index=True).values) > 0:
+                p_lat, p_lon = passenger_int.get_coordinates(ignore_index=True).values[1]
+                lats.append(p_lat)
+                lons.append(p_lon)
+
             df = pd.DataFrame({
                 'lat':lats,
                 'lon':lons})
-            
-            
             #filter dataset for other values
             this_vehicle = markerless_data.loc[markerless_data[filename_col]==x]        
             eye_height_full = this_vehicle["z"].values[0]/100
