@@ -363,13 +363,13 @@ def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col:
 
             # Tries to calculate actual location of front and pass side NVP if enough points exist to do so
             forward_int = data.geometry.intersection(forward_line[0], align = False)
-            if len(forward_int.get_coordinates(ignore_index=True).values) > 0:
+            if len(forward_int.get_coordinates(ignore_index=True).values) > 1:
                 f_lat, f_lon = forward_int.get_coordinates(ignore_index=True).values[1]
                 lats.append(f_lat)
                 lons.append(f_lon)
             
             passenger_int = data.geometry.intersection(passenger_line[0], align = False)
-            if len(passenger_int.get_coordinates(ignore_index=True).values) > 0:
+            if len(passenger_int.get_coordinates(ignore_index=True).values) > 1:
                 p_lat, p_lon = passenger_int.get_coordinates(ignore_index=True).values[1]
                 lats.append(p_lat)
                 lons.append(p_lon)
