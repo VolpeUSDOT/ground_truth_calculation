@@ -28,7 +28,8 @@ def main():
         markerless_data.columns = markerless_data.iloc[1]
         markerless_data = markerless_data.drop(markerless_data.index[0:2])
 
-    markerless_data = markerless_data.loc[65:67,]
+    # Index just the vehicles you need for debugging (uncomment below)
+    markerless_data = markerless_data.loc[16:18,]
 
     markerless_data = vh.markerless_loop(markerless_data, file_path, 'FileName - 20 m', forward_line, passenger_line)
 

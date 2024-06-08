@@ -192,6 +192,8 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
             # find sides of similar triangle from vru to ground
             a_vru = vru_height  # height
             c_vru = (a_vru*c_eye)/a_eye  # hypotenuse (similar triangles)
+            if abs(c_vru - a_vru) < 0.001: # slight rounding errors were causing problems for very very close values
+                c_vru = a_vru # set them equal if they are very close
             b_vru = mth.sqrt(c_vru**2 - a_vru**2)  # length, this is incorrect in the current VIEW app 2.0 code
 
             r_vru_nvp[i] = b_eye-b_vru  # find distance from eye to visible vru
