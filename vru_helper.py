@@ -1,16 +1,10 @@
 # Import necessary modules
 import geopandas as gpd
 from shapely.geometry import Polygon, mapping
-import json
 import pandas as pd
-import math
-import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
-from io import StringIO
-from PIL import Image
-from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
+import matplotlib
 import math as mth
 import os
 
@@ -54,6 +48,8 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
       'pre-school', 'elem_bike', 'elementary', 'wheelchair', 'adult_bike', 'adult'
       shoulder height, width, person height (all in [in])
       DOESN'T CONTAIN DEPTH, BUT ASSUMES THAT BICYCLES ARE 4X DEPTH OF PEOPLE AND IGNORES WHEELCHAIRS?'''
+    matplotlib.use('Agg')
+
     vru_label = ['pre-school child', 'elementary schooler on bike', 'elementary school child',
                  'wheelchair user', 'adult on bike', 'adult']
     vru_sizes = np.array([[28, 9, 34], [35, 12, 45], [37, 12, 45], [
@@ -328,6 +324,9 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
         os.makedirs(os.path.join(file_path, 'overhead_figures'))
     plt.savefig(os.path.join(file_path, 'overhead_figures','{}_{}_{}.png'.format(veh_name, filename_col, vru_out)), transparent=False, dpi='figure',
                  pad_inches=0, facecolor='#fff', edgecolor='#5c5c5c')
+    plt.close('all')
+    plt.cla()
+    plt.clf()
    # fig.savefig(imgdata, format='svg', transparent=False, dpi='figure',
           #      pad_inches=0, facecolor='#fff', edgecolor='#5c5c5c')
 

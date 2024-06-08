@@ -2,7 +2,6 @@
 import pandas as pd
 import os
 import geopandas as gpd
-import shapely
 import vru_helper as vh
 
 #===========================================================================================
@@ -10,6 +9,7 @@ def main():
     # Configure the below parameters to match your setup
     username = 'juwon.drake'
     file_name = "Markerless data.xlsx"
+    filename_column = 'FileName - 20 m'
 
     #==============================================================================================
 
@@ -29,12 +29,12 @@ def main():
         markerless_data = markerless_data.drop(markerless_data.index[0:2])
 
     # Index just the vehicles you need for debugging (uncomment below)
-    # markerless_data = markerless_data.loc[28:29,]
+    # markerless_data = markerless_data.loc[76:,]
 
-    markerless_data = vh.markerless_loop(markerless_data, file_path, 'FileName - 20 m', forward_line, passenger_line)
+    markerless_data = vh.markerless_loop(markerless_data, file_path, filename_column, forward_line, passenger_line)
 
     print('Writing Excel file to {}'.format(file_path))
-    markerless_data.to_excel(file_path + "MassDOT Markerless data_results_python.xlsx")
+    markerless_data.to_excel(os.path.join(file_path, "Markerless data results {}.xlsx".format(filename_column)))
     print('Done.')
 
 if __name__ == '__main__':
