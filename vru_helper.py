@@ -74,7 +74,7 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
   --------------------------'''
     # convert vehicle measurements from [m] to [ft]
     eye_height_full = eye_height_full*3.28084
-    eye_point_full = eye_point_full*3.28084
+    eye_point_full = eye_point_full*(-3.28084) # eye point Y values are negative in the current encoding
     dist_to_pass_window = dist_to_pass_window*3.28084
     
     # print(eye_height_full)
@@ -197,7 +197,7 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
         # add area of vru to area array
         # replace all NVPs greater than max distance with the max distance
         r_area_calc = np.copy(r_vru_nvp)
-        r_area_calc[r_area_calc > max_distance] = max_distance # I would look to change this to calculate NVPs all the way out to max distance
+        # r_area_calc[r_area_calc > max_distance] = max_distance # I would look to change this to calculate NVPs all the way out to max distance
         vru_points = np.stack(
             (r_area_calc * np.cos(theta_sorted), r_area_calc * np.sin(theta_sorted)), axis=1)
         vru_area = calculate_area(np.append(vru_points, [[0, 0]], axis=0))
@@ -335,6 +335,9 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
    # data = imgdata.getvalue()
 
    # return data, closest_forward_vrus, num_vrus_in_vru_nvp_area
+    import pdb
+    pdb.set_trace()
+
     return closest_forward_vrus, closest_passenger_vrus, num_vrus_in_vru_nvp_area, vru_nvp_areas
 
 def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col: str, forward_line: gpd.GeoDataFrame, passenger_line: gpd.GeoDataFrame) -> pd.DataFrame:
@@ -381,7 +384,12 @@ def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col:
             eye_height_full = this_vehicle["z"].values[0]/100
             eye_point_full =  this_vehicle["y"].values[0]/100 #y
             vru_selected=[1,3]
-            vehicle_width =  this_vehicle["x"].values[0]/100 +  this_vehicle["Eyepoint to pass side window (cm)"].values[0]/100 #eyepoint to pass window + x
+            veh_x = this_vehicle["x"]
+            # import pdb
+            # pdb.set_trace()
+            if pd.notna(this_vehicle['Adjusted x'].values[0]):
+                veh_x = this_vehicle['Adjusted x']
+            vehicle_width =  veh_x.values[0]/100 +  this_vehicle["Eyepoint to pass side window (cm)"].values[0]/100 #eyepoint to pass window + x
             vehicle_D = 1
             dist_to_passenger_window=this_vehicle["Eyepoint to pass side window (cm)"].values[0]/100
 
@@ -407,32 +415,32 @@ def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col:
             eye_point_full, [6], vehicle_width, vehicle_D, dist_to_passenger_window, veh_name, filename_col, file_path)
             
             markerless_data.loc[markerless_data[filename_col] == x, "Forward distance to preschool child"]=preschool_child_distance_front
-            markerless_data.loc[markerless_data[filename_col] == x, "Passenger distance to preschool child"]=preschool_child_distance_passenger
+            markerless_data.loc[markerless_data[filename_col] == x, "Pass. side distance to preschool child"]=preschool_child_distance_passenger
             markerless_data.loc[markerless_data[filename_col] == x, "# Preschool children in blind zone"]=preschool_child_count
             markerless_data.loc[markerless_data[filename_col] == x, "Preschool child blind zone area"]=preschool_child_area[1]
             
             markerless_data.loc[markerless_data[filename_col] == x, "Forward distance to elementary school child"]=elementary_child_distance_front
-            markerless_data.loc[markerless_data[filename_col] == x, "Passenger distance to elementary school child"]=elementary_child_distance_passenger
+            markerless_data.loc[markerless_data[filename_col] == x, "Pass. side distance to elementary school child"]=elementary_child_distance_passenger
             markerless_data.loc[markerless_data[filename_col] == x, "# elem school children in blind zone"]=elementary_child_count
             markerless_data.loc[markerless_data[filename_col] == x, "Elementary child blind zone area"]=elementary_child_area[1]
             
             markerless_data.loc[markerless_data[filename_col] == x, "Forward distance to adult"]=adult_distance_front
-            markerless_data.loc[markerless_data[filename_col] == x, "Passenger distance to adult"]=adult_distance_passenger
+            markerless_data.loc[markerless_data[filename_col] == x, "Pass. side distance to adult"]=adult_distance_passenger
             markerless_data.loc[markerless_data[filename_col] == x, "# adults in blind zone"]=adult_count
             markerless_data.loc[markerless_data[filename_col] == x, "Adult blind zone area"]=adult_area[1]
             
             markerless_data.loc[markerless_data[filename_col] == x, "Forward distance to wheelchair user"]=wheelchair_user_distance_front
-            markerless_data.loc[markerless_data[filename_col] == x, "Passenger distance to wheelchair user"]=wheelchair_user_distance_passenger
+            markerless_data.loc[markerless_data[filename_col] == x, "Pass. side distance to wheelchair user"]=wheelchair_user_distance_passenger
             markerless_data.loc[markerless_data[filename_col] == x, "# wheelchair users in blind zone"]=wheelchair_user_count
             markerless_data.loc[markerless_data[filename_col] == x, "Wheelchair user blind zone area"]=wheelchair_user_area[1]
             
             markerless_data.loc[markerless_data[filename_col] == x, "Forward distance to elementary school biker"]=elem_biker_distance_front
-            markerless_data.loc[markerless_data[filename_col] == x, "Passenger distance to elementary school biker"]=elem_biker_distance_passenger
+            markerless_data.loc[markerless_data[filename_col] == x, "Pass. side distance to elementary school biker"]=elem_biker_distance_passenger
             markerless_data.loc[markerless_data[filename_col] == x, "# elementary school bikers in blind zone"]=elem_biker_count
             markerless_data.loc[markerless_data[filename_col] == x, "Elementary school biker blind zone area"]=elem_biker_area[1]
             
             markerless_data.loc[markerless_data[filename_col] == x, "Forward distance to adult biker"]=adult_biker_distance_front
-            markerless_data.loc[markerless_data[filename_col] == x, "Passenger distance to adult biker"]=adult_biker_distance_passenger
+            markerless_data.loc[markerless_data[filename_col] == x, "Pass. side distance to adult biker"]=adult_biker_distance_passenger
             markerless_data.loc[markerless_data[filename_col] == x, "# adult bikers in blind zone"]=adult_biker_count
             markerless_data.loc[markerless_data[filename_col] == x, "Adult biker blind zone area"]=adult_biker_area[1]
 
