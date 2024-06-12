@@ -29,7 +29,7 @@ def main():
         markerless_data = markerless_data.drop(markerless_data.index[0:2])
 
     # Index just the vehicles you need for debugging (uncomment below)
-    markerless_data = markerless_data.loc[markerless_data['Vehicle name'] == 'Ford F-450 2024',]
+    # markerless_data = markerless_data.loc[markerless_data['Vehicle name'] == 'Ford F-450 2024',]
 
     markerless_data = vh.markerless_loop(markerless_data, file_path, filename_column, forward_line, passenger_line)
 
