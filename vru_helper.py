@@ -335,8 +335,6 @@ def viz_overhead(nvp_x_cartesian, nvp_y_cartesian, eye_height_full,
    # data = imgdata.getvalue()
 
    # return data, closest_forward_vrus, num_vrus_in_vru_nvp_area
-    import pdb
-    pdb.set_trace()
 
     return closest_forward_vrus, closest_passenger_vrus, num_vrus_in_vru_nvp_area, vru_nvp_areas
 
@@ -385,8 +383,7 @@ def markerless_loop(markerless_data: pd.DataFrame, file_path: str, filename_col:
             eye_point_full =  this_vehicle["y"].values[0]/100 #y
             vru_selected=[1,3]
             veh_x = this_vehicle["x"]
-            # import pdb
-            # pdb.set_trace()
+
             if pd.notna(this_vehicle['Adjusted x'].values[0]):
                 veh_x = this_vehicle['Adjusted x']
             vehicle_width =  veh_x.values[0]/100 +  this_vehicle["Eyepoint to pass side window (cm)"].values[0]/100 #eyepoint to pass window + x
